@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Activity Hub - School Learning Map Dashboard</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PapaParse for parsing CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Default Offline Initial Data -->
+    <script src="data.js"></script>
+    <!-- Curriculum templates database -->
+    <script src="curriculum_templates.js"></script>
+    <!-- Dynamic Curriculum Data from DOCs -->
+    <script src="curriculum_data.js"></script>
+    <!-- Main Dashboard Controller -->
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Main Header -->
+        <header class="main-header">
+            <div class="brand-section">
+                <div class="logo-container">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="brand-info">
+                    <div class="brand-title-row">
+                        <h1 class="brand-title">Integration Activity Hub</h1>
+                        <span class="brand-badge">Co-Designed</span>
+                    </div>
+                    <p class="brand-subtitle">ระบบสารสนเทศคลังแผนการจัดการเรียนรู้บูรณาการโดยใช้กิจกรรมประจำเดือนเป็นหลัก (ป.1 - ม.3)</p>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="btn" aria-label="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                    <span id="theme-text">โหมดมืด (Dark)</span>
+                </button>
+                
+                <!-- Google Sheet Connection Status -->
+                <div class="status-card">
+                    <div id="status-dot" class="status-dot active"></div>
+                    <span id="status-text" class="status-text">ซิงก์อยู่กับ Google Sheet สด</span>
+                    <span id="status-count" class="status-count">0 แผนบูรณาการ</span>
+                </div>
+                
+                <!-- Refresh / Sync Button -->
+                <button id="sync-btn" class="btn btn-icon" title="ซิงก์ข้อมูลจาก Google Sheets">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                
+                <!-- Settings Button -->
+                <button id="settings-btn" class="btn btn-icon" title="ตั้งค่าการเชื่อมต่อ">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary Grid Cards -->
+        <section class="summary-grid">
+            <!-- Card 1 -->
+            <div class="summary-card">
+                <div class="summary-icon-wrapper">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">แผนการเรียนรู้หลัก</span>
+                    <span id="stat-plans" class="summary-value">0 สื่อนวัตกรรม</span>
+                </div>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="summary-card">
+                <div class="summary-icon-wrapper">
+                    <i class="fa-solid fa-school"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">โรงเรียนภาคีร่วมสอน</span>
+                    <span id="stat-schools" class="summary-value">0 สถาบัน</span>
+                </div>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="summary-card">
+                <div class="summary-icon-wrapper">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="summary-info">
+                    <span class="summary-title">เชื่อมโยงตัวชี้วัด</span>
+                    <span id="stat-coverage" class="summary-value">ป.1 - ม.3 ครอบคลุม</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Section -->
+        <section class="filters-panel">
+            <div class="filters-row">
+                <!-- Dropdown วันสำคัญ -->
+                <div class="filter-group">
+                    <label for="filter-activity" class="filter-label">วันสำคัญ:</label>
+                    <select id="filter-activity" class="custom-select">
+                        <option value="ALL">กิจกรรมทั้งหมด</option>
+                    </select>
+                </div>
+                
+
+            </div>
+            
+            <!-- Horizontal Tabs ระดับชั้น -->
+            <div class="filter-group" style="align-items: flex-start; flex-direction: column; gap: 8px;">
+                <span class="filter-label">ระดับชั้น:</span>
+                <div id="filter-grades" class="tab-filter-container">
+                    <!-- Dynamic Grade Tabs will be generated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Workspace Columns -->
+        <main class="dashboard-content-layout">
+            <!-- Left Side: List View -->
+            <section class="sidebar-list-container">
+                <div class="list-header">
+                    <h2 id="list-count-title" class="list-title">
+                        <i class="fa-solid fa-list-check"></i>
+                        แผนการสอนบูรณาการที่ร่วมวิจัย (0)
+                    </h2>
+                </div>
+                <div id="plan-list" class="list-items">
+                    <!-- Plan Cards will be generated dynamically here -->
+                </div>
+            </section>
+
+            <!-- Right Side: Details View -->
+            <section id="detail-view" class="detail-view-container">
+                <!-- Initial Empty State -->
+                <div class="empty-detail-state">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <h3>กรุณาเลือกแผนการจัดการเรียนรู้</h3>
+                    <p>คลิกเลือกรายการแผนการสอนจากแผงด้านซ้าย เพื่อเปิดดูรายละเอียดความเชื่อมโยง เอกสารประกอบ สไลด์ วิดีโอ หรืออินโฟกราฟิกนำเสนอ</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Google Sheets Settings Modal -->
+    <div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">ตั้งค่าการเชื่อมต่อ Google Sheets</h3>
+                <button id="modal-close" class="modal-close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="sheets-url" class="form-label">ลิงก์ Google Sheets (หรือ ID ชีต):</label>
+                    <input type="text" id="sheets-url" class="form-input" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+                </div>
+                
+                <div class="help-text-box">
+                    <strong>วิธีการตั้งค่าเพื่อซิงก์ข้อมูลแบบ Real-time:</strong>
+                    <ol>
+                        <li>เปิด Google Sheets ที่เก็บข้อมูลการตอบกลับ</li>
+                        <li>คลิกปุ่ม <strong>แชร์ (Share)</strong> ด้านขวาบน และตั้งค่าการเข้าถึงเป็น <strong>"ทุกคนที่มีลิงก์มีสิทธิ์อ่าน" (Anyone with the link can view)</strong></li>
+                        <li>หรือแชร์โดยการไปที่ <strong>ไฟล์ (File) > แชร์ (Share) > เผยแพร่ทางเว็บ (Publish to web)</strong></li>
+                        <li>เลือกเป็น <strong>"ทั้งเอกสาร"</strong> และรูปเป็น <strong>"ค่าที่คั่นด้วยจุลภาค (.csv)"</strong> แล้วกดเผยแพร่</li>
+                        <li>คัดลอกลิงก์มาวางในช่องด้านบนนี้</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-reset" class="btn" title="กลับไปใช้ชีตเริ่มต้น">ใช้ค่าเริ่มต้น</button>
+                <button id="modal-save" class="btn btn-primary">บันทึกและซิงก์ข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
