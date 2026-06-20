@@ -228,7 +228,7 @@ function syncDataFromGoogleSheets(isSilent = false) {
 
     if (!isSilent) {
         // Show loading spinner
-        syncBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate spinner"></i>`;
+        syncBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin"></i>`;
         syncBtn.disabled = true;
         statusDot.className = "status-dot"; // remove active class to stop pulse during load
         statusText.innerText = "กำลังซิงก์ข้อมูลจาก Google Sheets...";
@@ -418,18 +418,88 @@ function setActiveGradeTab(grade) {
     applyFilters();
 }
 
+const GRADE_ORDER = {
+    'ป.1': 1, 'ป.2': 2, 'ป.3': 3, 'ป.4': 4, 'ป.5': 5, 'ป.6': 6,
+    'ม.1': 7, 'ม.2': 8, 'ม.3': 9
+};
+
+function getGradeSortIndex(grade) {
+    const clean = (grade || '').replace(/\s+/g, '');
+    return GRADE_ORDER[clean] || 99;
+}
+
 function applyFilters() {
     const cleanCurrentGrade = currentGrade.replace(/\s+/g, '');
-    filteredData = normalizedData.filter(item => {
-        // 1. Activity filter
-        const matchActivity = currentActivity === "ALL" || item.activity === currentActivity;
-        
-        // 2. Grade filter
-        const itemGrade = item.grade.replace(/\s+/g, '');
-        const matchGrade = cleanCurrentGrade === "ALL" || itemGrade === cleanCurrentGrade;
-        
-        return matchActivity && matchGrade;
+    
+    // Find all standard grades to consider based on grade filter
+    const standardGrades = ['ป.1', 'ป.2', 'ป.3', 'ป.4', 'ป.5', 'ป.6', 'ม.1', 'ม.2', 'ม.3'];
+    const gradesToConsider = cleanCurrentGrade === "ALL" 
+        ? standardGrades 
+        : [currentGrade];
+
+    let tempFiltered = [];
+
+    if (currentActivity === "ALL") {
+        // If "ALL" activities, just filter real items normally
+        tempFiltered = normalizedData.filter(item => {
+            const itemGrade = item.grade.replace(/\s+/g, '');
+            const matchGrade = cleanCurrentGrade === "ALL" || itemGrade === cleanCurrentGrade;
+            return matchGrade;
+        });
+    } else {
+        // If a specific activity is selected, ensure we show every grade level
+        // under consideration. If a grade has no data, add a placeholder.
+        const matchingRealItems = normalizedData.filter(item => {
+            const matchActivity = item.activity === currentActivity;
+            const itemGrade = item.grade.replace(/\s+/g, '');
+            const matchGrade = cleanCurrentGrade === "ALL" || itemGrade === cleanCurrentGrade;
+            return matchActivity && matchGrade;
+        });
+
+        // Find the month for the selected activity
+        const activityMonthMatch = normalizedData.find(item => item.activity === currentActivity);
+        const activityMonth = activityMonthMatch ? activityMonthMatch.month : "";
+
+        gradesToConsider.forEach(grade => {
+            const cleanGrade = grade.replace(/\s+/g, '');
+            const gradeRealItems = matchingRealItems.filter(item => item.grade.replace(/\s+/g, '') === cleanGrade);
+            
+            if (gradeRealItems.length > 0) {
+                tempFiltered.push(...gradeRealItems);
+            } else {
+                // No real item for this grade and activity -> Add a placeholder
+                tempFiltered.push({
+                    isPlaceholder: true,
+                    grade: grade,
+                    activity: currentActivity,
+                    month: activityMonth,
+                    school: "กำลัง update ข้อมูล",
+                    name: "กำลัง update ข้อมูล",
+                    email: "",
+                    pdf: "",
+                    doc: "",
+                    slide: "",
+                    video: "",
+                    infographic: ""
+                });
+            }
+        });
+    }
+
+    // Sort by grade level order
+    tempFiltered.sort((a, b) => {
+        const orderA = getGradeSortIndex(a.grade);
+        const orderB = getGradeSortIndex(b.grade);
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+        // If same grade, put real items before placeholders
+        if (a.isPlaceholder && !b.isPlaceholder) return 1;
+        if (!a.isPlaceholder && b.isPlaceholder) return -1;
+        return (a.school || '').localeCompare(b.school || '', 'th');
     });
+
+    filteredData = tempFiltered;
 
     // Update list title count
     listCountTitle.innerHTML = `<i class="fa-solid fa-list-check"></i> แผนการสอนบูรณาการที่ร่วมวิจัย (${filteredData.length})`;
@@ -456,35 +526,50 @@ function drawPlanListCards() {
 
     filteredData.forEach((item, idx) => {
         const card = document.createElement("div");
-        card.className = `plan-item-card ${idx === selectedItemIndex ? "active" : ""}`;
+        card.className = `plan-item-card ${item.isPlaceholder ? 'placeholder-card' : ''} ${idx === selectedItemIndex ? "active" : ""}`;
         
-        // Check resource links existence
-        const hasDoc = item.doc && item.doc.startsWith("http");
-        const hasSlide = item.slide && item.slide.startsWith("http");
-        const hasVideo = item.video && item.video.startsWith("http");
-        const hasInfographic = item.infographic && item.infographic.startsWith("http");
+        if (item.isPlaceholder) {
+            card.innerHTML = `
+                <div class="plan-card-meta">
+                    <span class="grade-badge" style="background-color: var(--border-hover); color: var(--text-muted); border: 1px solid var(--border-color);">ระดับ ${item.grade}</span>
+                    ${item.month ? `<span class="plan-date"><i class="fa-regular fa-calendar"></i> ${item.month}</span>` : ''}
+                </div>
+                <h3 class="plan-title" style="color: var(--text-muted);">${item.activity}</h3>
+                <div class="plan-details">
+                    <div class="plan-details-item" style="color: var(--color-warning); font-weight: 600;">
+                        <i class="fa-solid fa-arrows-rotate fa-spin"></i> กำลัง update ข้อมูล
+                    </div>
+                </div>
+            `;
+        } else {
+            // Check resource links existence
+            const hasDoc = item.doc && item.doc.startsWith("http");
+            const hasSlide = item.slide && item.slide.startsWith("http");
+            const hasVideo = item.video && item.video.startsWith("http");
+            const hasInfographic = item.infographic && item.infographic.startsWith("http");
 
-        card.innerHTML = `
-            <div class="plan-card-meta">
-                <span class="grade-badge">ระดับ ${item.grade}</span>
-                <span class="plan-date"><i class="fa-regular fa-calendar"></i> ${item.month}</span>
-            </div>
-            <h3 class="plan-title">${item.activity}</h3>
-            <div class="plan-details">
-                <div class="plan-details-item" title="${item.school}">
-                    <i class="fa-solid fa-school"></i> ${item.school}
+            card.innerHTML = `
+                <div class="plan-card-meta">
+                    <span class="grade-badge">ระดับ ${item.grade}</span>
+                    <span class="plan-date"><i class="fa-regular fa-calendar"></i> ${item.month}</span>
                 </div>
-                <div class="plan-details-item" title="${item.name}">
-                    <i class="fa-solid fa-user"></i> ${item.name}
+                <h3 class="plan-title">${item.activity}</h3>
+                <div class="plan-details">
+                    <div class="plan-details-item" title="${item.school}">
+                        <i class="fa-solid fa-school"></i> ${item.school}
+                    </div>
+                    <div class="plan-details-item" title="${item.name}">
+                        <i class="fa-solid fa-user"></i> ${item.name}
+                    </div>
                 </div>
-            </div>
-            <div class="plan-status-dots">
-                <div class="status-indicator-dot ${hasDoc ? 'active-doc' : ''}" title="${hasDoc ? 'แผนการสอน Doc (ส่งแล้ว)' : 'ไม่มีแผนการสอน Doc'}"></div>
-                <div class="status-indicator-dot ${hasSlide ? 'active-slide' : ''}" title="${hasSlide ? 'ชุดสไลด์ (ส่งแล้ว)' : 'ไม่มีชุดสไลด์'}"></div>
-                <div class="status-indicator-dot ${hasVideo ? 'active-video' : ''}" title="${hasVideo ? 'วิดีโอ (ส่งแล้ว)' : 'ไม่มีวิดีโอ'}"></div>
-                <div class="status-indicator-dot ${hasInfographic ? 'active-infographic' : ''}" title="${hasInfographic ? 'อินโฟกราฟิก (ส่งแล้ว)' : 'ไม่มีอินโฟกราฟิก'}"></div>
-            </div>
-        `;
+                <div class="plan-status-dots">
+                    <div class="status-indicator-dot ${hasDoc ? 'active-doc' : ''}" title="${hasDoc ? 'แผนการสอน Doc (ส่งแล้ว)' : 'ไม่มีแผนการสอน Doc'}"></div>
+                    <div class="status-indicator-dot ${hasSlide ? 'active-slide' : ''}" title="${hasSlide ? 'ชุดสไลด์ (ส่งแล้ว)' : 'ไม่มีชุดสไลด์'}"></div>
+                    <div class="status-indicator-dot ${hasVideo ? 'active-video' : ''}" title="${hasVideo ? 'วิดีโอ (ส่งแล้ว)' : 'ไม่มีวิดีโอ'}"></div>
+                    <div class="status-indicator-dot ${hasInfographic ? 'active-infographic' : ''}" title="${hasInfographic ? 'อินโฟกราฟิก (ส่งแล้ว)' : 'ไม่มีอินโฟกราฟิก'}"></div>
+                </div>
+            `;
+        }
 
         card.addEventListener("click", () => {
             // Update active selection
@@ -494,18 +579,22 @@ function drawPlanListCards() {
             
             selectedItemIndex = idx;
             
-            // Auto reset tab to first available resource
+            // Auto reset tab to first available resource if not placeholder
             const selectedItem = filteredData[selectedItemIndex];
-            if (selectedItem.doc.startsWith("http")) {
+            if (selectedItem.isPlaceholder) {
                 currentPreviewTab = "doc";
-            } else if (selectedItem.slide.startsWith("http")) {
-                currentPreviewTab = "slide";
-            } else if (selectedItem.video.startsWith("http")) {
-                currentPreviewTab = "video";
-            } else if (selectedItem.infographic.startsWith("http")) {
-                currentPreviewTab = "infographic";
             } else {
-                currentPreviewTab = "doc";
+                if (selectedItem.doc.startsWith("http")) {
+                    currentPreviewTab = "doc";
+                } else if (selectedItem.slide.startsWith("http")) {
+                    currentPreviewTab = "slide";
+                } else if (selectedItem.video.startsWith("http")) {
+                    currentPreviewTab = "video";
+                } else if (selectedItem.infographic.startsWith("http")) {
+                    currentPreviewTab = "infographic";
+                } else {
+                    currentPreviewTab = "doc";
+                }
             }
 
             drawDetailView();
@@ -551,6 +640,21 @@ function drawDetailView() {
     }
 
     const item = filteredData[selectedItemIndex];
+    
+    // Check if placeholder
+    if (item.isPlaceholder) {
+        detailView.innerHTML = `
+            <div class="empty-detail-state">
+                <i class="fa-solid fa-arrows-rotate fa-spin" style="font-size: 48px; color: var(--color-warning); margin-bottom: 16px;"></i>
+                <h3>กำลังอยู่ระหว่างการปรับปรุงข้อมูล</h3>
+                <p style="max-width: 400px; margin: 12px auto; line-height: 1.6; color: var(--text-secondary);">
+                    แผนการจัดการเรียนรู้บูรณาการระดับชั้น <strong>${item.grade}</strong> สำหรับกิจกรรม <strong>"${item.activity}"</strong> กำลังอยู่ในระหว่างอัปเดตข้อมูลเข้าระบบโดยคุณครูผู้รับผิดชอบ
+                </p>
+                <span class="detail-meta-pill primary" style="font-size: 12px; padding: 4px 12px;">โปรดกลับมาตรวจสอบอีกครั้งในภายหลัง</span>
+            </div>
+        `;
+        return;
+    }
     
     // Check links
     const hasDoc = item.doc && item.doc.startsWith("http");

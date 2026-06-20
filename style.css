@@ -541,6 +541,22 @@ a:hover {
     border-color: var(--color-primary);
 }
 
+.plan-item-card.placeholder-card {
+    border-style: dashed;
+    background-color: rgba(148, 163, 184, 0.05);
+    opacity: 0.85;
+}
+
+.plan-item-card.placeholder-card:hover {
+    border-style: solid;
+    opacity: 1;
+}
+
+.plan-item-card.placeholder-card.active {
+    background-color: var(--color-primary-light);
+    border-style: solid;
+}
+
 .plan-card-meta {
     display: flex;
     justify-content: space-between;
