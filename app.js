@@ -872,13 +872,6 @@ function renderViewport(item) {
                     ${formatText(product)}
                 </div>
             </div>
-
-            <!-- Download Button -->
-            <div class="summary-download-bar">
-                <a href="${item.doc}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-                    <i class="fa-solid fa-file-word"></i> เปิดดูไฟล์แผนการจัดการเรียนรู้ฉบับเต็ม (Doc)
-                </a>
-            </div>
         `;
         return;
     }
