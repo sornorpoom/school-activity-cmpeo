@@ -1,4 +1,4 @@
-const INITIAL_DATA = [
+﻿const INITIAL_DATA = [
     {
         "ประทับเวลา":  "3/6/2026, 12:27:27",
         "ที่อยู่อีเมล":  "kajipsa@gmail.com",
@@ -824,5 +824,47 @@ const INITIAL_DATA = [
         "2.1 ภารกิจเพิ่มเติมชุดสไลด์":  "https://drive.google.com/open?id=1SFsP4fe4EXzkowx58-1bQywJYq0tmvIl",
         "2.2 ภารกิจเพิ่มเติมวิดีโอ":  "https://drive.google.com/open?id=1SQg30btM6sR02le-T-4Np95eEwreLgCj",
         "2.3 ภารกิจเพิ่มเติมอินโฟกราฟฟิก":  "https://drive.google.com/open?id=10b-_Zsszxtb9cL7WaJMDvleA6GRBl6uJ"
+    },
+    {
+        "ประทับเวลา":  "20/6/2026, 13:24:50",
+        "ที่อยู่อีเมล":  "takandtakandtak@gmail.com",
+        "1.1    ชื่อ-สกุล ผู้รับผิดชอบ (ตัวอย่างการพิมพ์นายรัชภูมิ สมสมัย) ":  "นางแสงมะณี เจริญทรัพย์",
+        "1.2   โรงเรียน (ตัวอย่างการพิมพ์ โรงเรียนตั้งใจเรียนวิทยา)":  "โรงเรียนวัดล้านตอง",
+        "1.3  ระดับชั้นที่ได้รับมอบหมาย":  "ม.2",
+        "1.4 กิจกรรมประจำเดือน":  "พฤศจิกายน 2569",
+        "1.5   ชื่อกิจกรรมประจำเดือนที่เป็นโจทย์หลัก":  "ยี่เป็งเชียงใหม่",
+        "1.6  ส่งไฟล์ PDF และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=1gfUD2E-espq57QEGUZ_phonZwz98PyQE",
+        "1.7   ส่งไฟล์ Doc และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=18e6GYSuHAnSl5aPIFpfZMWfoIzxT9y_x",
+        "2.1 ภารกิจเพิ่มเติมชุดสไลด์":  "https://drive.google.com/open?id=1Qk7XmAf6Ne4aoZMZga8F5ScB3NICfdHs",
+        "2.2 ภารกิจเพิ่มเติมวิดีโอ":  "https://drive.google.com/open?id=1cqZaal48PiQ_Si9KAGr75U0VnrfcppgW",
+        "2.3 ภารกิจเพิ่มเติมอินโฟกราฟฟิก":  "https://drive.google.com/open?id=1qUN91yVmiVcKQ0EJH_5AAXa0MLCejQE7"
+    },
+    {
+        "ประทับเวลา":  "20/6/2026, 13:40:34",
+        "ที่อยู่อีเมล":  "takandtakandtak@gmail.com",
+        "1.1    ชื่อ-สกุล ผู้รับผิดชอบ (ตัวอย่างการพิมพ์นายรัชภูมิ สมสมัย) ":  "นายสุรพงศ์ เจริญทรัพย์",
+        "1.2   โรงเรียน (ตัวอย่างการพิมพ์ โรงเรียนตั้งใจเรียนวิทยา)":  "โรงเรียนวัดล้านตอง",
+        "1.3  ระดับชั้นที่ได้รับมอบหมาย":  "ม.1",
+        "1.4 กิจกรรมประจำเดือน":  "พฤศจิกายน 2569",
+        "1.5   ชื่อกิจกรรมประจำเดือนที่เป็นโจทย์หลัก":  "ยี่เป็งเชียงใหม่",
+        "1.6  ส่งไฟล์ PDF และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=1e1eadumktS9b2xn9hwyP8YQbEjEf7AxU",
+        "1.7   ส่งไฟล์ Doc และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=1tEjH2ktpHUsVVGlFZzHc2CazdCcC51_3",
+        "2.1 ภารกิจเพิ่มเติมชุดสไลด์":  "https://drive.google.com/open?id=1mMUkuv-6CgYZjvihIYA3LdZSnCYdr37E",
+        "2.2 ภารกิจเพิ่มเติมวิดีโอ":  "https://drive.google.com/open?id=1u-xoI9NCHtsmJlp9DYQhJgIwjObZIQ0v",
+        "2.3 ภารกิจเพิ่มเติมอินโฟกราฟฟิก":  "https://drive.google.com/open?id=145K_NF2HW861N03GG9cwxIvZV3yhH-ng"
+    },
+    {
+        "ประทับเวลา":  "20/6/2026, 17:34:29",
+        "ที่อยู่อีเมล":  "bookbanksutad@gmail.com",
+        "1.1    ชื่อ-สกุล ผู้รับผิดชอบ (ตัวอย่างการพิมพ์นายรัชภูมิ สมสมัย) ":  "นายสุทัศน์  ศรีแสง",
+        "1.2   โรงเรียน (ตัวอย่างการพิมพ์ โรงเรียนตั้งใจเรียนวิทยา)":  "โรงเรียนวัดเวฬุวัน",
+        "1.3  ระดับชั้นที่ได้รับมอบหมาย":  "ม.3",
+        "1.4 กิจกรรมประจำเดือน":  "กุมภาพันธ์ 2570",
+        "1.5   ชื่อกิจกรรมประจำเดือนที่เป็นโจทย์หลัก":  "วันวาเลนไทน์",
+        "1.6  ส่งไฟล์ PDF และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=1vRKPtT0wC3v9CVFK4FuEQeVSV4HTQQnG",
+        "1.7   ส่งไฟล์ Doc และตั้งชื่อไฟล์โดยใช้รูปแบบนี้ “วันไหว้ครู / ป.1 / รัชภูมิ”":  "https://drive.google.com/open?id=1539hadt-VzG_tPZO-5L59ZxUKBBxaBmB",
+        "2.1 ภารกิจเพิ่มเติมชุดสไลด์":  "https://drive.google.com/open?id=1yYWZKFDdnj424ivGxTAnZCZFqI094hgd",
+        "2.2 ภารกิจเพิ่มเติมวิดีโอ":  "https://drive.google.com/open?id=1daIsbNfYBn2s_Ljsdf36lePJSklGMDxB",
+        "2.3 ภารกิจเพิ่มเติมอินโฟกราฟฟิก":  "https://drive.google.com/open?id=1wqpbfmaHvbtopjWvtFbIMVo-YGneuTVx"
     }
 ];
